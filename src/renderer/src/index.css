@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Markdown 渲染样式 */
+.markdown {
+  line-height: 1.65;
+  word-break: break-word;
+}
+.markdown > * + * {
+  margin-top: 0.5em;
+}
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  font-weight: 600;
+  margin-top: 1em;
+}
+.markdown h1 {
+  font-size: 1.25em;
+}
+.markdown h2 {
+  font-size: 1.15em;
+}
+.markdown h3 {
+  font-size: 1.05em;
+}
+.markdown ul {
+  list-style: disc;
+  padding-left: 1.25em;
+}
+.markdown ol {
+  list-style: decimal;
+  padding-left: 1.25em;
+}
+.markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.markdown :not(pre) > code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.markdown pre {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.75em 1em;
+  overflow-x: auto;
+}
+.markdown pre code {
+  font-size: 0.85em;
+}
+.markdown a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+.markdown blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  padding-left: 0.75em;
+  color: #a1a1aa;
+}
+.markdown table {
+  border-collapse: collapse;
+}
+.markdown th,
+.markdown td {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.35em 0.6em;
+}
+
+/* highlight.js 暗色 token 着色 */
+.hljs {
+  color: #e4e4e7;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color: #c084fc;
+}
+.hljs-string,
+.hljs-attr {
+  color: #86efac;
+}
+.hljs-number,
+.hljs-symbol {
+  color: #fca5a5;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #71717a;
+  font-style: italic;
+}
+.hljs-title,
+.hljs-function,
+.hljs-section {
+  color: #93c5fd;
+}
+.hljs-built_in,
+.hljs-type,
+.hljs-class {
+  color: #fbbf24;
+}
+.hljs-meta {
+  color: #f472b6;
+}
+.hljs-variable,
+.hljs-template-variable {
+  color: #fdba74;
+}
