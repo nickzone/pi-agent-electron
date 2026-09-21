@@ -112,16 +112,40 @@ export function closeActiveSession(): void {
   closeSession()
 }
 
+export interface PromptImage {
+  type: 'image'
+  data: string
+  mimeType: string
+}
+
 /** 发送消息；若 agent 正在流式输出则排队（followUp） */
-export async function prompt(text: string): Promise<void> {
+export async function prompt(text: string, images: PromptImage[] = []): Promise<void> {
   const s = getSession()
+  const options = images.length > 0 ? { images } : undefined
   if (s.isStreaming) {
     log.info('Agent 正在流式输出，消息进入 followUp 队列')
-    await s.prompt(text, { streamingBehavior: 'followUp' })
+    await s.prompt(text, { ...options, streamingBehavior: 'followUp' })
   } else {
     log.info('空闲状态，直接发送 prompt')
-    await s.prompt(text)
+    await s.prompt(text, options)
   }
+}
+
+/** 切换当前会话使用的模型 */
+export async function setModel(modelName: string): Promise<void> {
+  const separator = modelName.indexOf('/')
+  if (separator <= 0 || separator === modelName.length - 1) {
+    throw new Error(`无效的模型名称: ${modelName}`)
+  }
+  const model = (await ensureModelRuntime()).getModel(
+    modelName.slice(0, separator),
+    modelName.slice(separator + 1),
+  )
+  if (!model) {
+    throw new Error(`找不到模型: ${modelName}`)
+  }
+  await getSession().setModel(model)
+  log.info('已切换模型:', modelName)
 }
 
 /** 中止当前运行 */
@@ -216,7 +240,11 @@ function convertAgentMessage(msg: unknown): ChatMessage {
         })
       }
     }
-    return { id: nextMsgId(), role: 'assistant', content, thinking, toolCalls, done: true }
+    const usage = m.usage as { input?: number; output?: number; cacheRead?: number; cacheWrite?: number; cost?: { total?: number } } | undefined
+    return {
+      id: nextMsgId(), role: 'assistant', content, thinking, toolCalls, done: true,
+      usage: usage ? { input: usage.input ?? 0, output: usage.output ?? 0, cacheRead: usage.cacheRead ?? 0, cacheWrite: usage.cacheWrite ?? 0, total: (usage.input ?? 0) + (usage.output ?? 0) + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0), cost: usage.cost?.total } : undefined,
+    }
   }
 
   // toolResult / custom / summary 等：当前 UI 展示为空占位，避免重复追加

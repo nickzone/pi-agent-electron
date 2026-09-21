@@ -12,10 +12,12 @@ export function MessageList(): React.JSX.Element {
   }, [messages])
 
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto p-4">
+    <div className="mx-auto flex h-full w-full max-w-4xl flex-col gap-6 overflow-y-auto px-6 py-8">
       {messages.length === 0 && (
-        <div className="flex h-full flex-col items-center justify-center gap-1 text-sm text-zinc-600">
-          <span>{hasSession ? '开始与 Agent 对话' : '请在左侧选择或新建一个项目与会话'}</span>
+        <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-2xl text-blue-400 ring-1 ring-blue-400/20">✦</div>
+          <div className="text-base font-medium text-zinc-300">{hasSession ? '准备开始协作' : '选择一个会话开始'}</div>
+          <div className="text-sm text-zinc-600">{hasSession ? '描述你的问题、代码任务或想法' : '请在左侧选择或新建一个项目与会话'}</div>
         </div>
       )}
       {messages.map((m) => {

@@ -44,7 +44,7 @@
   },
   "build": {
     "appId": "com.example.pi-agent-electron",
-    "productName": "Pi Agent",
+    "productName": "Agent",
     "directories": {
       "output": "release"
     },

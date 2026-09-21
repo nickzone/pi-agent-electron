@@ -14,6 +14,15 @@ export interface ToolCall {
   output: string
 }
 
+export interface TokenUsage {
+  input: number
+  output: number
+  cacheRead: number
+  cacheWrite: number
+  total: number
+  cost?: number
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
@@ -21,6 +30,7 @@ export interface ChatMessage {
   thinking: string
   toolCalls: ToolCall[]
   done: boolean
+  usage?: TokenUsage
 }
 
 /** 一个项目 = 一个工作目录 + 其下的一组实时会话 */
@@ -96,5 +106,6 @@ export type AgentEvent =
   | { type: 'auto_retry_end'; success: boolean; attempt: number; finalError?: string }
   | { type: 'bash_execution_update'; id?: string; delta: string }
   | { type: 'thinking_level_changed'; level: string }
+  | { type: 'token_usage'; usage: TokenUsage }
   | { type: 'session_info_changed'; name?: string }
   | { type: 'entry_appended'; entry: unknown }

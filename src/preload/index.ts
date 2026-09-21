@@ -33,7 +33,9 @@ const api = {
   removeSession: (projectId: string, sessionPath: string): Promise<{ ok: boolean }> =>
     ipcRenderer.invoke('app:removeSession', projectId, sessionPath),
 
-  prompt: (text: string): Promise<void> => ipcRenderer.invoke('agent:prompt', text),
+  prompt: (text: string, images?: { type: 'image'; data: string; mimeType: string }[]): Promise<void> =>
+    ipcRenderer.invoke('agent:prompt', text, images),
+  setModel: (modelName: string): Promise<void> => ipcRenderer.invoke('agent:setModel', modelName),
   abort: (): Promise<void> => ipcRenderer.invoke('agent:abort'),
   openLogs: (): Promise<{ ok: boolean; error?: string }> => ipcRenderer.invoke('app:openLogs'),
 

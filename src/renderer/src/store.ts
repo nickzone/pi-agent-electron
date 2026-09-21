@@ -9,6 +9,7 @@ interface AgentState {
   error: string | null
   modelStatus: 'loading' | 'ready' | 'error'
   availableModels: string[]
+  selectedModel: string | null
 
   // 项目 / 会话管理
   projects: Project[]
@@ -21,6 +22,7 @@ interface AgentState {
   addUserMessage: (text: string) => void
   setError: (message: string) => void
   setModelReady: (models: string[]) => void
+  setSelectedModel: (model: string) => void
   setModelError: (message: string) => void
   setProjects: (projects: Project[]) => void
   setSessions: (sessions: SessionInfo[]) => void
@@ -69,11 +71,21 @@ function updateLastAssistant(patch: (msg: ChatMessage) => ChatMessage): void {
   useAgentStore.setState({ messages: [...state.messages.slice(0, -1), patch(last)] })
 }
 
-function markLastAssistantDone(): void {
+function markLastAssistantDone(message?: unknown): void {
   const state = useAgentStore.getState()
   const last = state.messages[state.messages.length - 1]
   if (last && last.role === 'assistant' && !last.done) {
-    useAgentStore.setState({ messages: [...state.messages.slice(0, -1), { ...last, done: true }] })
+    const raw = message as { usage?: { input?: number; output?: number; cacheRead?: number; cacheWrite?: number; cost?: { total?: number } } } | undefined
+    const u = raw?.usage
+    const usage = u ? {
+      input: u.input ?? 0,
+      output: u.output ?? 0,
+      cacheRead: u.cacheRead ?? 0,
+      cacheWrite: u.cacheWrite ?? 0,
+      total: (u.input ?? 0) + (u.output ?? 0) + (u.cacheRead ?? 0) + (u.cacheWrite ?? 0),
+      cost: u.cost?.total,
+    } : undefined
+    useAgentStore.setState({ messages: [...state.messages.slice(0, -1), { ...last, done: true, usage }] })
   }
 }
 
@@ -149,6 +161,7 @@ export const useAgentStore = create<AgentState>((set) => ({
   error: null,
   modelStatus: 'loading',
   availableModels: [],
+  selectedModel: null,
 
   // 项目 / 会话管理
   projects: [],
@@ -200,7 +213,9 @@ export const useAgentStore = create<AgentState>((set) => ({
         break
 
       case 'message_end':
-        markLastAssistantDone()
+        if ((event.message as Record<string, unknown>)?.role === 'assistant') {
+          markLastAssistantDone(event.message)
+        }
         break
 
       case 'agent_end':
@@ -237,8 +252,13 @@ export const useAgentStore = create<AgentState>((set) => ({
   },
   setModelReady: (models) => {
     log.info('模型就绪:', models)
-    set({ modelStatus: 'ready', availableModels: models })
+    set((state) => ({
+      modelStatus: 'ready',
+      availableModels: models,
+      selectedModel: state.selectedModel && models.includes(state.selectedModel) ? state.selectedModel : models[0] ?? null,
+    }))
   },
+  setSelectedModel: (model) => set({ selectedModel: model }),
   setModelError: (message) => {
     log.error('模型初始化失败:', message)
     set({ modelStatus: 'error', error: message })

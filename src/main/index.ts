@@ -11,6 +11,8 @@ import {
   openSession,
   prompt,
   setEventForwarder,
+  setModel,
+  type PromptImage,
 } from './agent'
 import {
   addProject,
@@ -73,7 +75,7 @@ function createWindow(): void {
 }
 
 function forwardToWindow(event: AgentSessionEvent): void {
-  log.debug('转发 Agent 事件:', event.type)
+  // log.debug('转发 Agent 事件:', event.type)
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('agent:event', event)
   }
@@ -167,9 +169,13 @@ function registerIpcHandlers(): void {
     return { ok: true }
   })
 
-  ipcMain.handle('agent:prompt', async (_event, text: string) => {
-    log.info('收到 prompt，长度:', text.length)
-    await prompt(text)
+  ipcMain.handle('agent:prompt', async (_event, text: string, images?: PromptImage[]) => {
+    log.info('收到 prompt，长度:', text.length, '图片数量:', images?.length ?? 0)
+    await prompt(text, images)
+  })
+
+  ipcMain.handle('agent:setModel', async (_event, modelName: string) => {
+    await setModel(modelName)
   })
 
   ipcMain.handle('agent:abort', async () => {

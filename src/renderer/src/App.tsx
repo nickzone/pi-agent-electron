@@ -49,23 +49,21 @@ export default function App(): React.JSX.Element {
   }
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100">
+    <div className="app-shell flex h-screen bg-[#0b0b0d] text-zinc-100">
       <Sidebar />
 
-      <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
-          <button
-            type="button"
-            onClick={openLogs}
-            title="打开日志目录"
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
-          >
-            <FileText className="h-3.5 w-3.5" />
-            日志
-          </button>
-          <span className="font-semibold">Pi Agent</span>
+      <main className="flex min-w-0 flex-1 flex-col bg-[radial-gradient(circle_at_50%_-20%,rgba(59,130,246,.08),transparent_45%)]">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[.07] px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 ring-1 ring-blue-400/20">✦</div>
+            <div>
+              <div className="text-sm font-semibold tracking-tight">Agent Workspace</div>
+              <div className="text-[11px] text-zinc-500">本地智能编程助手</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
           {modelStatus === 'ready' && (
-            <span className="text-xs text-emerald-400">模型就绪</span>
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />模型就绪</span>
           )}
           {modelStatus === 'error' && (
             <span className="text-xs text-red-400">初始化失败</span>
@@ -73,6 +71,8 @@ export default function App(): React.JSX.Element {
           {modelStatus === 'loading' && (
             <span className="text-xs text-zinc-500">初始化中…</span>
           )}
+          <button type="button" onClick={openLogs} title="打开日志目录" className="rounded-lg p-2 text-zinc-500 hover:bg-white/[.06] hover:text-zinc-200"><FileText className="h-4 w-4" /></button>
+          </div>
         </header>
 
         {error && (
@@ -81,7 +81,9 @@ export default function App(): React.JSX.Element {
           </div>
         )}
 
-        <MessageList />
+        <div className="min-h-0 flex-1">
+          <MessageList />
+        </div>
         <Composer />
       </main>
     </div>

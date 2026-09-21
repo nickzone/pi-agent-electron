@@ -23,7 +23,8 @@ declare global {
       messages?: ChatMessage[]
     }>
     removeSession(projectId: string, sessionPath: string): Promise<{ ok: boolean }>
-    prompt(text: string): Promise<void>
+    prompt(text: string, images?: { type: 'image'; data: string; mimeType: string }[]): Promise<void>
+    setModel(modelName: string): Promise<void>
     abort(): Promise<void>
     openLogs(): Promise<{ ok: boolean; error?: string }>
     onEvent(listener: (event: AgentEvent) => void): () => void

@@ -20,11 +20,11 @@ export function Message({ message }: { message: ChatMessage }): React.JSX.Elemen
   const isUser = message.role === 'user'
 
   return (
-    <div className={cn('flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
+    <div className={cn('group flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
       <div
         className={cn(
-          'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-          isUser ? 'bg-blue-600' : 'bg-violet-600',
+          'flex h-8 w-8 shrink-0 items-center justify-center rounded-xl',
+          isUser ? 'bg-blue-500/20 text-blue-300' : 'bg-violet-500/15 text-violet-300',
         )}
       >
         {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -32,7 +32,7 @@ export function Message({ message }: { message: ChatMessage }): React.JSX.Elemen
 
       <div className={cn('max-w-[85%] min-w-0', isUser && 'text-right')}>
         {isUser ? (
-          <div className="inline-block whitespace-pre-wrap rounded-2xl bg-blue-600 px-4 py-2 text-sm text-white">
+          <div className="inline-block whitespace-pre-wrap rounded-2xl rounded-tr-md bg-blue-600/90 px-4 py-2.5 text-sm leading-6 text-white shadow-lg shadow-blue-950/20">
             {message.content}
           </div>
         ) : (
@@ -44,12 +44,16 @@ export function Message({ message }: { message: ChatMessage }): React.JSX.Elemen
             ))}
 
             {message.content && (
-              <div className="markdown text-sm text-zinc-200">
+              <div className="rounded-2xl rounded-tl-md border border-white/[.07] bg-white/[.035] px-4 py-3 shadow-xl shadow-black/10">
+                <div className="markdown text-sm text-zinc-200">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
                   {message.content}
                 </ReactMarkdown>
+                </div>
               </div>
             )}
+
+            {message.done && message.usage && <UsageView usage={message.usage} />}
 
             {!message.content &&
               !message.thinking &&
@@ -63,6 +67,19 @@ export function Message({ message }: { message: ChatMessage }): React.JSX.Elemen
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function UsageView({ usage }: { usage: NonNullable<ChatMessage['usage']> }): React.JSX.Element {
+  return (
+    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-500" title="本轮对话 token 消耗">
+      <span>本轮 Token {usage.total.toLocaleString()}</span>
+      <span>输入 {usage.input.toLocaleString()}</span>
+      <span>输出 {usage.output.toLocaleString()}</span>
+      <span>缓存命中 {usage.cacheRead.toLocaleString()}</span>
+      <span>缓存写入 {usage.cacheWrite.toLocaleString()}</span>
+      {usage.cost != null && <span>费用 ${usage.cost.toFixed(6)}</span>}
     </div>
   )
 }
